@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "The Toll Booth",
+  "version": "1.0.0",
+  "description": "Pay with productivity. Complete a micro-task before accessing distracting sites.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "webNavigation",
+    "scripting",
+    "alarms",
+    "identity",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "https://*.firebaseapp.com/*",
+    "https://*.googleapis.com/*",
+    "https://securetoken.googleapis.com/*",
+    "https://identitytoolkit.googleapis.com/*",
+    "https://api.todoist.com/*",
+    "https://api.anthropic.com/*"
+  ],
+  "background": {
+    "service_worker": "service-worker-loader.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "The Toll Booth"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "assets/content.js-BrcMwEwo.js"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "options_page": "src/options/options.html",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "resources": [
+        "src/tollbooth/tollbooth.html",
+        "src/offscreen/offscreen.html"
+      ],
+      "use_dynamic_url": false
+    },
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "resources": [
+        "assets/content.js-BrcMwEwo.js",
+        "assets/content.js-BrcMwEwo.js.map"
+      ],
+      "use_dynamic_url": false
+    }
+  ]
+}

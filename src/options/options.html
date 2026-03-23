@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>The Toll Booth — Options</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="topbar-icon">🚦</span>
+    <div>
+      <div class="topbar-title">THE TOLL BOOTH</div>
+      <div class="topbar-sub">EXTENSION OPTIONS</div>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- Stats -->
+    <div class="card card-full">
+      <div class="card-title">📊 Overview</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-num" id="stat-tasks">—</div>
+          <div class="stat-label">TASKS IN QUEUE</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="stat-sites">—</div>
+          <div class="stat-label">BLOCKED SITES</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="stat-timer">—</div>
+          <div class="stat-label">MIN PER SESSION</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tasks -->
+    <div class="card">
+      <div class="card-title">📋 Task queue</div>
+      <div class="card-desc">Tasks are picked at random each time you hit a blocked site.</div>
+      <div class="input-row">
+        <input type="text" id="task-input" class="input" placeholder="Add a new task…" maxlength="120" />
+        <button class="btn btn-primary" id="add-task-btn">ADD</button>
+      </div>
+      <div class="list" id="task-list"></div>
+    </div>
+
+    <!-- Sites -->
+    <div class="card">
+      <div class="card-title">🔒 Blocked sites</div>
+      <div class="card-desc">Enter bare hostnames — the extension strips www. automatically.</div>
+      <div class="input-row">
+        <input type="text" id="site-input" class="input" placeholder="e.g. reddit.com" />
+        <button class="btn btn-primary" id="add-site-btn">ADD</button>
+      </div>
+      <div class="list" id="site-list"></div>
+    </div>
+
+    <!-- Timer -->
+    <div class="card">
+      <div class="card-title">⏱ Session timer</div>
+      <div class="card-desc">How many minutes of access are granted after a toll is paid.</div>
+      <div class="setting-row">
+        <input type="number" id="timer-input" class="input input--timer" min="1" max="120" />
+        <span class="setting-unit">minutes</span>
+        <button class="btn btn-secondary btn--ml-auto" id="save-timer-btn">SAVE</button>
+      </div>
+    </div>
+
+    <!-- Integrations -->
+    <div class="card">
+      <div class="card-title">🔷 Todoist integration</div>
+      <div class="card-desc">Pull live tasks from Todoist. Falls back to local queue if unavailable.</div>
+      <input type="text" id="todoist-token" class="input input-full" placeholder="API token" autocomplete="off" />
+      <input type="text" id="todoist-project" class="input input-full" placeholder="Project ID (optional)" autocomplete="off" />
+      <button class="btn btn-secondary btn-full" id="save-todoist-btn">SAVE TODOIST CONFIG</button>
+    </div>
+
+  </div>
+
+  <div id="toast"></div>
+  <script src="options.js" type="module"></script>
+</body>
+</html>
