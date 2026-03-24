@@ -15,14 +15,31 @@ import { getAuth } from 'firebase/auth/web-extension';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyA8LGskj6m-zORNcrpz9O1bN22ddaBeJDk',
-  authDomain: 'the-toll-booth.firebaseapp.com',
-  projectId: 'the-toll-booth',
-  storageBucket: 'the-toll-booth.firebasestorage.app',
-  messagingSenderId: '591194995140',
-  appId: '1:591194995140:web:30291d0e81620d72e2cc91',
-  measurementId: 'G-PTXRY26N75',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
+
+const requiredEnvVars = [
+  'VITE_FIREBASE_API_KEY',
+  'VITE_FIREBASE_AUTH_DOMAIN',
+  'VITE_FIREBASE_PROJECT_ID',
+  'VITE_FIREBASE_STORAGE_BUCKET',
+  'VITE_FIREBASE_MESSAGING_SENDER_ID',
+  'VITE_FIREBASE_APP_ID',
+];
+
+const missingEnvVars = requiredEnvVars.filter((key) => !import.meta.env[key]);
+
+if (missingEnvVars.length > 0) {
+  throw new Error(
+    `Missing Firebase environment variables: ${missingEnvVars.join(', ')}`,
+  );
+}
 
 // Guard against double-initialisation across service-worker restarts and
 // module hot-reloads — getApps() returns existing instances.
