@@ -4,7 +4,7 @@ import manifest from './manifest.json' with { type: 'json' };
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const oauthClientId = env.VITE_GOOGLE_CLIENT_ID;
+  const oauthClientId = env.VITE_GOOGLE_EXTENSION_CLIENT_ID;
 
   const extensionManifest = oauthClientId
     ? {

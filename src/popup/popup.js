@@ -430,7 +430,7 @@ async function renderStats() {
     `${tasks.length} task${tasks.length !== 1 ? 's' : ''} · ${sites.length} site${sites.length !== 1 ? 's' : ''} blocked`;
 }
 
-const OAUTH_CLIENT_ID = '591194995140-l9tnvc65fk1sijgfrhicahb8sl2vl76a.apps.googleusercontent.com';
+const OAUTH_CLIENT_ID = import.meta.env.VITE_GOOGLE_WEB_CLIENT_ID;
 const OAUTH_SCOPES = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
 
 function getChromeAuthToken(interactive) {
