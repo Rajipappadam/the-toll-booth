@@ -39,6 +39,13 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
+  "oauth2": {
+    "client_id": "25752069465-gscrs6uq24ic5dvih1uiish1if7n6lkn.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile"
+    ]
+  },
   "web_accessible_resources": [
     {
       "resources": [

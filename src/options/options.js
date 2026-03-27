@@ -1,27 +1,27 @@
-/**
- * options.js — Full-page options UI logic
- */
-
-// ── Init ──────────────────────────────────────────────────────────────────────
+import {
+  getBlockedSites,
+  getTasks,
+  getTimerDuration,
+  setBlockedSites,
+  setTasks,
+  setTimerDuration,
+} from '../shared/storage.js';
 
 async function init() {
   await Promise.all([renderTasks(), renderSites(), loadSettings(), renderStats()]);
 }
 
-// ── Stats ─────────────────────────────────────────────────────────────────────
-
 async function renderStats() {
-  const [tasks, sites, { timerDuration = 15 }] = await Promise.all([
+  const [tasks, sites, timerDuration] = await Promise.all([
     getTasks(),
-    getSites(),
-    chrome.storage.local.get('timerDuration'),
+    getBlockedSites(),
+    getTimerDuration(),
   ]);
+
   document.getElementById('stat-tasks').textContent = tasks.length;
   document.getElementById('stat-sites').textContent = sites.length;
   document.getElementById('stat-timer').textContent = timerDuration;
 }
-
-// ── Tasks ─────────────────────────────────────────────────────────────────────
 
 async function renderTasks() {
   const tasks = await getTasks();
@@ -31,33 +31,34 @@ async function renderTasks() {
     list.innerHTML = `
       <div class="empty">
         <span class="empty-icon">📝</span>
-        No tasks yet — add one above.
+        No tasks yet - add one above.
       </div>`;
     return;
   }
 
   list.innerHTML = tasks
     .map(
-      (t) => `
+      (task) => `
       <div class="list-item">
-        <span class="item-text">${escapeHtml(t.text)}</span>
-        <button class="btn-delete" data-id="${t.id}" title="Remove">✕</button>
+        <span class="item-text">${escapeHtml(task.text)}</span>
+        <button class="btn-delete" data-id="${task.id}" title="Remove">✕</button>
       </div>`,
     )
     .join('');
 
-  list.querySelectorAll('.btn-delete').forEach((btn) =>
-    btn.addEventListener('click', () => deleteTask(btn.dataset.id)),
-  );
+  list.querySelectorAll('.btn-delete').forEach((button) => {
+    button.addEventListener('click', () => deleteTask(button.dataset.id));
+  });
 }
 
 async function addTask() {
   const input = document.getElementById('task-input');
   const text = input.value.trim();
   if (!text) return;
+
   const tasks = await getTasks();
   tasks.push({ id: uid(), text });
-  await chrome.storage.local.set({ tasks });
+  await setTasks(tasks);
   input.value = '';
   await renderTasks();
   await renderStats();
@@ -65,20 +66,18 @@ async function addTask() {
 
 async function deleteTask(id) {
   const tasks = await getTasks();
-  await chrome.storage.local.set({ tasks: tasks.filter((t) => t.id !== id) });
+  await setTasks(tasks.filter((task) => task.id !== id));
   await renderTasks();
   await renderStats();
 }
 
 document.getElementById('add-task-btn').addEventListener('click', addTask);
-document.getElementById('task-input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') addTask();
+document.getElementById('task-input').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') addTask();
 });
 
-// ── Sites ─────────────────────────────────────────────────────────────────────
-
 async function renderSites() {
-  const sites = await getSites();
+  const sites = await getBlockedSites();
   const list = document.getElementById('site-list');
 
   if (sites.length === 0) {
@@ -92,95 +91,78 @@ async function renderSites() {
 
   list.innerHTML = sites
     .map(
-      (s) => `
+      (site) => `
       <div class="list-item">
-        <span class="item-text site-text">${escapeHtml(s)}</span>
-        <button class="btn-delete" data-site="${escapeHtml(s)}" title="Remove">✕</button>
+        <span class="item-text site-text">${escapeHtml(site)}</span>
+        <button class="btn-delete" data-site="${escapeHtml(site)}" title="Remove">✕</button>
       </div>`,
     )
     .join('');
 
-  list.querySelectorAll('.btn-delete').forEach((btn) =>
-    btn.addEventListener('click', () => deleteSite(btn.dataset.site)),
-  );
+  list.querySelectorAll('.btn-delete').forEach((button) => {
+    button.addEventListener('click', () => deleteSite(button.dataset.site));
+  });
 }
 
 async function addSite() {
   const input = document.getElementById('site-input');
   let value = input.value.trim().toLowerCase();
   if (!value) return;
-  value = value
-    .replace(/^https?:\/\//, '')
-    .replace(/^www\./, '')
-    .split('/')[0];
+
+  value = value.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
   if (!value) return;
-  const sites = await getSites();
+
+  const sites = await getBlockedSites();
   if (!sites.includes(value)) {
     sites.push(value);
-    await chrome.storage.local.set({ blockedSites: sites });
+    await setBlockedSites(sites);
   }
+
   input.value = '';
   await renderSites();
   await renderStats();
 }
 
 async function deleteSite(site) {
-  const sites = await getSites();
-  await chrome.storage.local.set({ blockedSites: sites.filter((s) => s !== site) });
+  const sites = await getBlockedSites();
+  await setBlockedSites(sites.filter((item) => item !== site));
   await renderSites();
   await renderStats();
 }
 
 document.getElementById('add-site-btn').addEventListener('click', addSite);
-document.getElementById('site-input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') addSite();
+document.getElementById('site-input').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') addSite();
 });
 
-// ── Settings ──────────────────────────────────────────────────────────────────
-
 async function loadSettings() {
-  const data = await chrome.storage.local.get([
-    'timerDuration',
-    'todoistToken',
-    'todoistProjectId',
-  ]);
-  document.getElementById('timer-input').value = data.timerDuration ?? 15;
+  const data = await chrome.storage.local.get(['todoistToken', 'todoistProjectId']);
+  document.getElementById('timer-input').value = await getTimerDuration();
   document.getElementById('todoist-token').value = data.todoistToken ?? '';
   document.getElementById('todoist-project').value = data.todoistProjectId ?? '';
 }
 
 document.getElementById('save-timer-btn').addEventListener('click', async () => {
-  const val = parseInt(document.getElementById('timer-input').value, 10);
-  if (!val || val < 1 || val > 120) {
+  const value = parseInt(document.getElementById('timer-input').value, 10);
+  if (!value || value < 1 || value > 120) {
     showToast('Enter a value between 1 and 120.', true);
     return;
   }
-  await chrome.storage.local.set({ timerDuration: val });
+
+  await setTimerDuration(value);
   await renderStats();
-  showToast('Timer saved!');
+  showToast('Timer saved.');
 });
 
 document.getElementById('save-todoist-btn').addEventListener('click', async () => {
   const token = document.getElementById('todoist-token').value.trim();
   const projectId = document.getElementById('todoist-project').value.trim();
   await chrome.storage.local.set({ todoistToken: token, todoistProjectId: projectId });
-  showToast('Todoist config saved!');
+  showToast('Todoist config saved.');
 });
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-async function getTasks() {
-  const { tasks = [] } = await chrome.storage.local.get('tasks');
-  return tasks;
-}
-
-async function getSites() {
-  const { blockedSites = [] } = await chrome.storage.local.get('blockedSites');
-  return blockedSites;
-}
-
-function escapeHtml(str) {
-  return String(str)
+function escapeHtml(value) {
+  return String(value)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -191,13 +173,27 @@ function uid() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-let _toastTimer;
-function showToast(msg, isError = false) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `${isError ? 'error' : ''} visible`;
-  clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => el.classList.remove('visible'), 2200);
+let toastTimer;
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `${isError ? 'error' : ''} visible`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('visible'), 2200);
 }
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== 'local') return;
+
+  if (changes.tasks) {
+    void renderTasks();
+  }
+  if (changes.blockedSites) {
+    void renderSites();
+  }
+  if (changes.timerDuration || changes.tasks || changes.blockedSites) {
+    void renderStats();
+  }
+});
 
 init();

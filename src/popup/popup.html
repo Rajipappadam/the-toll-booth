@@ -6,12 +6,21 @@
   <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
-
   <div class="header">
     <span class="header-icon">🚦</span>
     <div>
       <div class="header-title">THE TOLL BOOTH</div>
       <div class="header-sub">PAY WITH PRODUCTIVITY</div>
+    </div>
+  </div>
+
+  <div id="sync-banner" class="sync-banner hidden">
+    <div class="sync-copy">
+      <div id="sync-title" class="sync-title">Back up your queue with Google Sign-In</div>
+      <div id="sync-subtitle" class="sync-subtitle">Local mode stays enabled even when sync is off.</div>
+    </div>
+    <div id="sync-actions" class="sync-actions">
+      <button class="btn btn-primary" id="sign-in-btn">Enable Sync</button>
     </div>
   </div>
 
@@ -21,18 +30,17 @@
     <div class="tab" data-tab="settings">SETTINGS</div>
   </div>
 
-  <!-- ── TASKS pane ── -->
   <div class="tab-pane active" id="pane-tasks">
     <div>
       <div class="section-label">Add task</div>
       <div class="input-row">
-        <input type="text" id="task-input" class="input" placeholder="e.g. Reply to 3 emails…" maxlength="120" />
+        <input type="text" id="task-input" class="input" placeholder="e.g. Reply to 3 emails..." maxlength="120" />
         <button class="btn btn-primary" id="add-task-btn">ADD</button>
       </div>
     </div>
 
     <div id="ai-btn-row">
-      <button class="btn-ai" id="ai-suggest-btn">✨ Suggest tasks with AI</button>
+      <button class="btn-ai" id="ai-suggest-btn">Suggest tasks with AI</button>
       <div class="suggestions" id="ai-suggestions"></div>
     </div>
 
@@ -42,7 +50,6 @@
     </div>
   </div>
 
-  <!-- ── SITES pane ── -->
   <div class="tab-pane" id="pane-sites">
     <div>
       <div class="section-label">Block a site</div>
@@ -64,10 +71,30 @@
     </div>
   </div>
 
-  <!-- ── SETTINGS pane ── -->
   <div class="tab-pane" id="pane-settings">
     <div class="setting-group">
-      <div class="setting-label">⏱ Timer duration</div>
+      <div class="setting-label">Sync account</div>
+      <div class="setting-desc">Google Sign-In is used only for Firestore backup and restore.</div>
+      <div id="account-card" class="account-card hidden">
+        <div class="account-main">
+          <img id="account-avatar" class="account-avatar hidden" alt="" />
+          <div>
+            <div id="account-name" class="account-name"></div>
+            <div id="account-email" class="account-email"></div>
+          </div>
+        </div>
+        <div class="account-actions">
+          <button class="btn btn-secondary" id="sync-now-btn">SYNC NOW</button>
+          <button class="btn btn-ghost" id="sign-out-btn">SIGN OUT</button>
+        </div>
+      </div>
+      <div id="account-empty" class="setting-desc">Not signed in. Data stays local until you enable sync.</div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="setting-group">
+      <div class="setting-label">Timer duration</div>
       <div class="setting-desc">Minutes of access granted after completing a task.</div>
       <div class="setting-row">
         <input type="number" id="timer-input" class="input input--timer" min="1" max="120" value="15" />
@@ -79,19 +106,19 @@
     <div class="sep"></div>
 
     <div class="setting-group">
-      <div class="setting-label">🔷 Todoist integration</div>
+      <div class="setting-label">Todoist integration</div>
       <div class="setting-desc">Pull tasks live from Todoist instead of the local queue.</div>
-      <input type="text" id="todoist-token" class="input-full" placeholder="API token — todoist.com/prefs/integrations" autocomplete="off" />
-      <input type="text" id="todoist-project" class="input-full" placeholder="Project ID (optional — blank = all tasks)" autocomplete="off" />
+      <input type="text" id="todoist-token" class="input-full" placeholder="API token - todoist.com/prefs/integrations" autocomplete="off" />
+      <input type="text" id="todoist-project" class="input-full" placeholder="Project ID (optional - blank = all tasks)" autocomplete="off" />
       <button class="btn btn-secondary btn-full" id="save-todoist-btn">SAVE TODOIST CONFIG</button>
     </div>
 
     <div class="sep"></div>
 
     <div class="setting-group">
-      <div class="setting-label">✨ Anthropic AI</div>
-      <div class="setting-desc">Enable AI task suggestions using Claude. Key is stored locally.</div>
-      <input type="password" id="anthropic-key" class="input-full" placeholder="sk-ant-…" autocomplete="off" />
+      <div class="setting-label">Anthropic AI</div>
+      <div class="setting-desc">Enable AI task suggestions using Claude. Key is stored locally only.</div>
+      <input type="password" id="anthropic-key" class="input-full" placeholder="sk-ant-..." autocomplete="off" />
       <button class="btn btn-secondary btn-full" id="save-anthropic-btn">SAVE API KEY</button>
     </div>
   </div>
